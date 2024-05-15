@@ -1,20 +1,27 @@
-const express = require("express");
-// const fs = require("fs");
-const cors = require("cors");
-const bodyParser = require("body-parser");
 
-const { connectDB } = require("./db");
-const { PORT } = require("./config");
-const { router } = require("./routes");
+
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+
+import { connectDB } from "./db";
+import { PORT } from "./config";
+import { router } from "./routes";
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(cors());
 
-connectDB();
-app.use(router);
+connectDB()
+  .then(() => {
+    app.use(router);
 
-app.listen(PORT, () => {
-  console.log("App is running on port " + PORT);
-});
+    app.listen(PORT, () => {
+      console.log(`App is running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error("Failed to connect to the database:", err);
+    process.exit(1); // Exit with failure code
+  });
